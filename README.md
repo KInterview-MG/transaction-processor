@@ -35,7 +35,7 @@ $ cargo run -- transactions.csv > accounts.csv
 * Locked accounts are prevented from depositing and withdrawing, but allowed to create and handle disputes.
 * If a dispute is resolved, a new dispute must be created before a chargeback can occur.
 * If a chargeback occurs, the transaction cannot be disputed again.
-* Currency amounts are less than `(2^96)/(10^4)` (approx `2^82`).
+* Currency amounts are less than `(2^96)/(10^4)` (approx `2^82`). Overflows are handled safely.
 * For efficiency, transaction IDs are handled per user account, rather than globally.
   * In other words, two users can both have a deposit/withdrawal with the same ID.
 * Duplicate transaction IDs are not allowed within a user's account.
