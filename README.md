@@ -16,6 +16,7 @@ $ cargo run -- transactions.csv > accounts.csv
 * Transactions are applied atomically -- either all of each transaction is applied, or none of it.
 * If the `TransactionProcessor` detects a transaction error, it will report this through the `Result` return value.
 * If the CLI app (`main.rs`) detects a transaction error, it will log the error to `stderr` and skip the transaction.
+  * Logging is disabled by default, and can be enabled using the `-v` command line flag.
 * No part of the program should ever panic, unless it encounters an allocation failure.
   * E.g. `unwrap()` is only ever used in tests, overflows are always checked and handled gracefully, and collections are accessed safely.
 

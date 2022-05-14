@@ -11,30 +11,38 @@ use std::io;
 use log::LevelFilter;
 use transaction_processor::TransactionProcessor;
 
-use crate::args::{parse_args, ArgsError};
+use crate::args::parse_args;
 use crate::csv::{CSVReader, CSVWriter};
 
 mod args;
 mod csv;
 
 fn main() {
+    let args = match parse_args() {
+        Ok(args) => args,
+        Err(err) => {
+            log::error!("Error parsing arguments: {}", err);
+            std::process::exit(1);
+        }
+    };
+
+    let log_level = if args.verbose() {
+        LevelFilter::Info
+    } else {
+        LevelFilter::Off
+    };
+
     if let Err(err) = env_logger::Builder::new()
-        .filter_level(LevelFilter::Info)
+        .filter_level(log_level)
         .try_init()
     {
         eprintln!("Failed to create logger ({}). Continuing anyway.", err);
     }
 
-    if let Err(err) = transaction_processor_cli() {
+    if let Err(err) = process_files(args.input_files(), io::stdout()) {
         log::error!("{}", err);
         std::process::exit(1);
     }
-}
-
-/// Parses the command line arguments and runs the transaction processor.
-fn transaction_processor_cli() -> Result<(), TransactionProcessorCLIError> {
-    let args = parse_args()?;
-    process_files(args.input_files(), io::stdout())
 }
 
 /// Processes the list of transactions in the specified files, and outputs
@@ -87,8 +95,6 @@ fn process_files(
 /// Fatal error occurred when running the application.
 #[derive(Debug)]
 enum TransactionProcessorCLIError {
-    /// There was a problem with the provided command line arguments.
-    ArgsError(ArgsError),
     /// One of the specified files could not be opened.
     FailedToOpenFile { path: String, error: io::Error },
 }
@@ -96,19 +102,10 @@ enum TransactionProcessorCLIError {
 impl Display for TransactionProcessorCLIError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.write_str(&match self {
-            TransactionProcessorCLIError::ArgsError(err) => {
-                format!("Invalid arguments: {}", err)
-            }
             TransactionProcessorCLIError::FailedToOpenFile { path, error } => {
                 format!("Failed to open '{}': {}", path, error)
             }
         })
-    }
-}
-
-impl From<ArgsError> for TransactionProcessorCLIError {
-    fn from(err: ArgsError) -> Self {
-        Self::ArgsError(err)
     }
 }
 
