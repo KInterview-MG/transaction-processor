@@ -1,5 +1,7 @@
 # TransactionProcessor
 
+[![CI](https://github.com/KInterview-MG/transaction-processor/actions/workflows/build.yml/badge.svg)](https://github.com/KInterview-MG/transaction-processor/actions/workflows/build.yml)
+
 Usage:
 
 ```bash
