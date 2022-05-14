@@ -134,7 +134,9 @@ mod test {
             let mut output = Vec::new();
             process_files(&[input_file], &mut output).unwrap();
 
-            let expected = std::fs::read_to_string(expected_output_file).unwrap();
+            let expected = std::fs::read_to_string(expected_output_file)
+                .unwrap()
+                .replace("\r\n", "\n");
 
             assert_eq!(expected, String::from_utf8_lossy(output.as_slice()));
         }
