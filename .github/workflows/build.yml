@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '30 5 * * *'
+
+jobs:
+
+  build:
+    name: Build and test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macOS-latest ]
+
+    steps:
+      -   uses: actions/checkout@v2
+
+      -   name: Build
+          run: cargo build
+
+      -   name: Test
+          run: cargo test
+
+      -   name: Build (release)
+          run: cargo build --release
+
+      -   name: Test (release)
+          run: cargo test --release
+
+  test_cli:
+    name: Run test_cli_interface.sh
+    runs-on: ubuntu-latest
+
+    steps:
+      -   uses: actions/checkout@v2
+
+      -   name: Test
+          run: ./test_cli_interface.sh
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Clippy
+        run: cargo clippy
+
+  fmt:
+    name: Formatting
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Formatting
+        run: cargo fmt -- --check
+
+  doc:
+    name: Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Documentation
+        run: cargo doc --no-deps
